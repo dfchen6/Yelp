@@ -16,6 +16,8 @@ class Business: NSObject {
     let distance: String?
     let ratingImageURL: NSURL?
     let reviewCount: NSNumber?
+    let latitude: NSNumber?
+    let longitude: NSNumber?
     
     init(dictionary: NSDictionary) {
         name = dictionary["name"] as? String
@@ -29,10 +31,19 @@ class Business: NSObject {
         
         let location = dictionary["location"] as? NSDictionary
         var address = ""
+        var latitude = NSNumber()
+        var longitude = NSNumber()
+        
         if location != nil {
             let addressArray = location!["address"] as? NSArray
             if addressArray != nil && addressArray!.count > 0 {
                 address = addressArray![0] as! String
+            }
+            
+            let coordinate = location!["coordinate"] as? NSDictionary
+            if coordinate != nil{
+                latitude = (coordinate!["latitude"] as? NSNumber)!
+                longitude = (coordinate!["longitude"] as? NSNumber)!
             }
             
             let neighborhoods = location!["neighborhoods"] as? NSArray
@@ -44,6 +55,8 @@ class Business: NSObject {
             }
         }
         self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
         
         let categoriesArray = dictionary["categories"] as? [[String]]
         if categoriesArray != nil {
@@ -88,7 +101,7 @@ class Business: NSObject {
         YelpClient.sharedInstance.searchWithTerm(term, completion: completion)
     }
     
-    class func searchWithTerm(term: String, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: ([Business]!, NSError!) -> Void) -> Void {
-        YelpClient.sharedInstance.searchWithTerm(term, sort: sort, categories: categories, deals: deals, completion: completion)
+    class func searchWithTerm(offset: Int, term: String, sort: YelpSortMode?, categories: [String]?, deals: Bool?, completion: ([Business]!, NSError!) -> Void) -> Void {
+        YelpClient.sharedInstance.searchWithTerm(offset, term: term, sort: sort, categories: categories, deals: deals, completion: completion)
     }
 }
